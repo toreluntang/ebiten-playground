@@ -47,28 +47,38 @@ func (f *Food) Update() error {
 type Player struct {
 	imagePath string
 	x, y      float64
+	currImg   image.Image
 }
 
 func NewPlayer(x, y float64) Player {
-	return Player{
-		imagePath: "assets/Snake4.png",
-		x:         x,
-		y:         y,
-	}
-}
-
-func (p *Player) Draw(screen *ebiten.Image) {
-	// Initially lets just crop a non-animated snake and draw it
-	img, _, err := ebitenutil.NewImageFromFile(p.imagePath)
+	imagePath := "assets/Snake4.png"
+	img, _, err := ebitenutil.NewImageFromFile(imagePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	crop := image.Rect(0, 0, 16, 16)
 	croppedImg := img.SubImage(crop)
-	screen.DrawImage(ebiten.NewImageFromImage(croppedImg), &ebiten.DrawImageOptions{})
+
+	return Player{
+		imagePath: imagePath,
+		x:         x,
+		y:         y,
+		currImg:   croppedImg,
+	}
+}
+
+func (p *Player) Draw(screen *ebiten.Image) {
+	// Initially lets just crop a non-animated snake and draw it
+
+	opts := &ebiten.DrawImageOptions{}
+	opts.GeoM.Translate(p.x, p.y)
+	screen.DrawImage(ebiten.NewImageFromImage(p.currImg), opts)
 }
 
 func (p *Player) Update() error {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+		p.y += 1
+	}
 	return nil
 }
