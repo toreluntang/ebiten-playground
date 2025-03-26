@@ -13,8 +13,9 @@ import (
 type Game struct {
 
 	// Food related variables
-	food    []food
-	maxFood int
+	food            []food
+	maxFood         int
+	foodTickCounter int
 }
 
 type food struct {
@@ -41,7 +42,7 @@ func (f *food) draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Update() error {
-	g.randSpawnFood()
+	g.tickFood()
 	return nil
 }
 
@@ -54,6 +55,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return 320, 240
+}
+
+func (g *Game) tickFood() {
+	g.foodTickCounter += 1
+	if g.foodTickCounter == 50 { // TODO: Extract to constants probably
+		g.randSpawnFood()
+		g.foodTickCounter = 0
+	}
 }
 
 func (g *Game) randSpawnFood() {
