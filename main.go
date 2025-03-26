@@ -11,6 +11,7 @@ import (
 )
 
 type Game struct {
+
 	// Food related variables
 	food    []food
 	maxFood int
@@ -19,6 +20,14 @@ type Game struct {
 type food struct {
 	imgPath string
 	x, y    float64
+}
+
+func NewFood(x, y float64) food {
+	return food{
+		imgPath: "assets/asset-pack/Items/Food/Fish.png",
+		x:       x,
+		y:       y,
+	}
 }
 
 func (f *food) draw(screen *ebiten.Image) {
@@ -59,13 +68,7 @@ func (g *Game) randSpawnFood() {
 		randY := rand.IntN(230) - size
 		x := math.Max(0, float64(randX))
 		y := math.Max(0, float64(randY))
-
-		g.addFood(
-			food{
-				imgPath: "assets/asset-pack/Items/Food/Fish.png",
-				x:       x,
-				y:       y,
-			})
+		g.addFood(NewFood(x, y))
 	}
 }
 
