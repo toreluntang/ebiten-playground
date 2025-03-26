@@ -12,6 +12,7 @@ import (
 )
 
 type Game struct {
+	player entities.Player
 
 	// Food related variables
 	food            []entities.Food
@@ -30,6 +31,11 @@ func (g *Game) Update() error {
 		return nil
 	}
 
+	playerErr := g.player.Update()
+	if playerErr != nil {
+		return playerErr
+	}
+
 	g.tickFood()
 	return nil
 }
@@ -40,8 +46,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		f.Draw(screen)
 	}
 
+	g.player.Draw(screen)
+
 	if g.pause {
-		ebitenutil.DebugPrintAt(screen, "Paused", 320/2, 240/2)
+		ebitenutil.DebugPrintAt(screen, "Paused", 140, 5)
 	}
 }
 
@@ -96,6 +104,7 @@ func (g *Game) addFood(f entities.Food) {
 
 func NewGame() *Game {
 	return &Game{
+		player:  entities.NewPlayer(1, 1),
 		maxFood: 10,
 	}
 }
