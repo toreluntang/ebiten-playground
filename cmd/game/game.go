@@ -18,6 +18,11 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
+	err := checkKeyPress()
+	if err != nil {
+		return err
+	}
+
 	g.tickFood()
 	return nil
 }
@@ -31,6 +36,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return 320, 240
+}
+
+func checkKeyPress() error {
+	if ebiten.IsKeyPressed(ebiten.KeyQ) {
+		// Quit the game
+		return ebiten.Termination
+	}
+	return nil
 }
 
 func (g *Game) tickFood() {
