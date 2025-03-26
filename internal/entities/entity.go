@@ -3,6 +3,7 @@ package entities
 import (
 	"image"
 	"log"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -70,15 +71,28 @@ func NewPlayer(x, y float64) Player {
 
 func (p *Player) Draw(screen *ebiten.Image) {
 	// Initially lets just crop a non-animated snake and draw it
-
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(p.x, p.y)
 	screen.DrawImage(ebiten.NewImageFromImage(p.currImg), opts)
 }
 
 func (p *Player) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
-		p.y += 1
+	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+		loc := p.y - 1
+		p.y = math.Max(0, loc)
 	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+		loc := p.y + 1
+		p.y = math.Min(240-16, loc) // TODO: Move 240 to contants.WorldSizeHeight move 16 to constants.playerSize
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+		loc := p.x - 1
+		p.x = math.Max(0, loc)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+		loc := p.x + 1
+		p.x = math.Min(320-16, loc)
+	}
+
 	return nil
 }
