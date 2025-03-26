@@ -1,7 +1,7 @@
 package main
 
 import (
-	"eat-and-go/cmd/game"
+	"eat-and-grow/cmd/game"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"

@@ -1,4 +1,4 @@
-module eat-and-go
+module eat-and-grow
 
 go 1.24.1
 

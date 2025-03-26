@@ -1,44 +1,20 @@
 package game
 
 import (
+	"eat-and-grow/internal/entities"
 	"image/color"
-	"log"
 	"math"
 	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type Game struct {
 
 	// Food related variables
-	food            []food
+	food            []entities.Food
 	maxFood         int
 	foodTickCounter int
-}
-
-type food struct {
-	imgPath string
-	x, y    float64
-}
-
-func NewFood(x, y float64) food {
-	return food{
-		imgPath: "assets/asset-pack/Items/Food/Fish.png",
-		x:       x,
-		y:       y,
-	}
-}
-
-func (f *food) draw(screen *ebiten.Image) {
-	img, _, err := ebitenutil.NewImageFromFile(f.imgPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Translate(f.x, f.y)
-	screen.DrawImage(img, opts)
 }
 
 func (g *Game) Update() error {
@@ -49,7 +25,7 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0, 100, 255, 255})
 	for _, f := range g.food {
-		f.draw(screen)
+		f.Draw(screen)
 	}
 }
 
@@ -77,12 +53,12 @@ func (g *Game) randSpawnFood() {
 		randY := rand.IntN(230) - size
 		x := math.Max(0, float64(randX))
 		y := math.Max(0, float64(randY))
-		g.addFood(NewFood(x, y))
+		g.addFood(entities.NewFood(x, y))
 	}
 }
 
 // addFood adds a food item to the game along with its collider for convenience
-func (g *Game) addFood(f food) {
+func (g *Game) addFood(f entities.Food) {
 	g.food = append(g.food, f)
 }
 
