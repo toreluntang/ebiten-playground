@@ -7,6 +7,8 @@ import (
 	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type Game struct {
@@ -15,12 +17,17 @@ type Game struct {
 	food            []entities.Food
 	maxFood         int
 	foodTickCounter int
+	pause           bool
 }
 
 func (g *Game) Update() error {
-	err := checkKeyPress()
+	err := g.checkKeyPress()
 	if err != nil {
 		return err
+	}
+
+	if g.pause {
+		return nil
 	}
 
 	g.tickFood()
@@ -32,18 +39,30 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for _, f := range g.food {
 		f.Draw(screen)
 	}
+
+	if g.pause {
+		ebitenutil.DebugPrintAt(screen, "Paused", 320/2, 240/2)
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return 320, 240
 }
 
-func checkKeyPress() error {
+func (g *Game) checkKeyPress() error {
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
-		// Quit the game
 		return ebiten.Termination
 	}
+
+	if inpututil.IsKeyJustReleased(ebiten.KeyP) {
+		g.Pause()
+	}
+
 	return nil
+}
+
+func (g *Game) Pause() {
+	g.pause = !g.pause
 }
 
 func (g *Game) tickFood() {
