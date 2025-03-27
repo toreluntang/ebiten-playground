@@ -55,7 +55,7 @@ type Player struct {
 	spriteSize  int
 	currImg     image.Image
 	currImgIdx  int
-	sprites     []image.Image
+	sprites     []*ebiten.Image
 	tickCounter int
 }
 
@@ -67,7 +67,7 @@ func NewPlayer(x, y float64) Player {
 		log.Fatal(err)
 	}
 
-	spriteAtIndex := func(index int) image.Image {
+	spriteAtIndex := func(index int) *ebiten.Image {
 		row := index % (img.Bounds().Max.X / spriteSize)
 		col := index / (img.Bounds().Max.X / spriteSize)
 		x0 := row * spriteSize
@@ -76,10 +76,10 @@ func NewPlayer(x, y float64) Player {
 		y1 := y0 + 16
 
 		cropSpace := image.Rect(int(x0), int(y0), int(x1), int(y1))
-		return img.SubImage(cropSpace)
+		return ebiten.NewImageFromImage(img.SubImage(cropSpace))
 	}
 
-	var allSprites []image.Image
+	var allSprites []*ebiten.Image
 	for i := range 16 {
 		allSprites = append(allSprites, spriteAtIndex(i))
 	}
@@ -138,8 +138,7 @@ func (p *Player) updateCurrImage() {
 		return
 	}
 
-	img := p.sprites[p.currImgIdx]
-	p.currImg = ebiten.NewImageFromImage(img)
+	p.currImg = p.sprites[p.currImgIdx]
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
