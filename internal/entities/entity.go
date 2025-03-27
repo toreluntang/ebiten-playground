@@ -3,7 +3,6 @@ package entities
 import (
 	"image"
 	"log"
-	"math"
 	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -155,24 +154,33 @@ func (p *Player) Update() error {
 	p.dx = 0
 	p.dy = 0
 	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
-		loc := p.y - 1
-		p.y = math.Max(0, loc)
 		p.dy = -1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
-		loc := p.y + 1
-		p.y = math.Min(240-16, loc) // TODO: Move 240 to contants.WorldSizeHeight move 16 to constants.playerSize
 		p.dy = 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
-		loc := p.x - 1
-		p.x = math.Max(0, loc)
 		p.dx = -1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
-		loc := p.x + 1
-		p.x = math.Min(320-16, loc)
 		p.dx = 1
+	}
+
+	// move the player based on the velocity
+	p.x += p.dx
+	p.y += p.dy
+
+	if p.x < 0 {
+		p.x = 320
+	}
+	if p.x > 320 {
+		p.x = 0
+	}
+	if p.y < 0 {
+		p.y = 240
+	}
+	if p.y > 240 {
+		p.y = 0
 	}
 
 	if (p.dx != 0 || p.dy != 0) && p.tickCounter%5 == 0 {
