@@ -146,30 +146,13 @@ func (p *Player) Draw(screen *ebiten.Image) {
 	screen.DrawImage(ebiten.NewImageFromImage(p.currImg), opts)
 }
 
-func (p *Player) Update() error {
-	if p.tickCounter >= 100 {
-		p.tickCounter = 0
-	}
-	p.tickCounter++
-	p.dx = 0
-	p.dy = 0
-	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
-		p.dy = -1
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
-		p.dy = 1
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
-		p.dx = -1
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
-		p.dx = 1
-	}
+func (p *Player) move() {
 
-	// move the player based on the velocity
+	// Move the player based on the velocity
 	p.x += p.dx
 	p.y += p.dy
 
+	// Teleport the player when out of bounds
 	if p.x < 0 {
 		p.x = 320
 	}
@@ -182,6 +165,33 @@ func (p *Player) Update() error {
 	if p.y > 240 {
 		p.y = 0
 	}
+}
+
+func (p *Player) handleInput() {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+		p.dy = -1
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+		p.dy = 1
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+		p.dx = -1
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+		p.dx = 1
+	}
+}
+
+func (p *Player) Update() error {
+	if p.tickCounter >= 100 {
+		p.tickCounter = 0
+	}
+	p.tickCounter++
+
+	p.dx = 0
+	p.dy = 0
+	p.handleInput()
+	p.move()
 
 	if (p.dx != 0 || p.dy != 0) && p.tickCounter%5 == 0 {
 		p.updateCurrImage()
