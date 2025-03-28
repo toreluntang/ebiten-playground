@@ -15,7 +15,7 @@ type Game struct {
 	player entities.Player
 
 	// Food related variables
-	food            []entities.Food
+	food            []*entities.Food
 	maxFood         int
 	foodTickCounter int
 	pause           bool
@@ -36,7 +36,20 @@ func (g *Game) Update() error {
 		return playerErr
 	}
 
-	g.tickFood()
+	// Handle food updates
+	aliveFood := []*entities.Food{}
+	for _, f := range g.food {
+		if foodErr := f.Update(); foodErr != nil {
+			return foodErr
+		}
+
+		if !f.Destroyed() {
+			aliveFood = append(aliveFood, f)
+		}
+	}
+	g.food = aliveFood
+
+	g.tickSpawnFood()
 	return nil
 }
 
@@ -73,7 +86,7 @@ func (g *Game) Pause() {
 	g.pause = !g.pause
 }
 
-func (g *Game) tickFood() {
+func (g *Game) tickSpawnFood() {
 	g.foodTickCounter += 1
 	if g.foodTickCounter == 50 { // TODO: Extract to constants probably
 		g.randSpawnFood()
@@ -93,12 +106,13 @@ func (g *Game) randSpawnFood() {
 		randY := rand.IntN(230) - size
 		x := math.Max(0, float64(randX))
 		y := math.Max(0, float64(randY))
-		g.addFood(entities.NewFood(x, y))
+		f := entities.NewFood(x, y)
+		g.addFood(&f)
 	}
 }
 
 // addFood adds a food item to the game along with its collider for convenience
-func (g *Game) addFood(f entities.Food) {
+func (g *Game) addFood(f *entities.Food) {
 	g.food = append(g.food, f)
 }
 

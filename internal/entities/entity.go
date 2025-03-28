@@ -3,6 +3,7 @@ package entities
 import (
 	"image"
 	"log"
+	"math"
 	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -16,18 +17,31 @@ import (
 type Entity interface {
 	Draw(screen *ebiten.Image)
 	Update() error
+	Destroyed() bool
+}
+
+type entityBase struct {
+	imgPath     string
+	x, y        float64
+	tickCounter int
 }
 
 type Food struct {
-	imgPath string
-	x, y    float64
+	entityBase
+	ticksToLive int
+	opacity     float64
 }
 
 func NewFood(x, y float64) Food {
 	return Food{
-		imgPath: "assets/asset-pack/Items/Food/Fish.png",
-		x:       x,
-		y:       y,
+		entityBase: entityBase{
+			imgPath:     "assets/asset-pack/Items/Food/Fish.png",
+			x:           x,
+			y:           y,
+			tickCounter: 0,
+		},
+		opacity:     100,
+		ticksToLive: 100,
 	}
 }
 
@@ -38,11 +52,29 @@ func (f *Food) Draw(screen *ebiten.Image) {
 	}
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(f.x, f.y)
+
+	opacity := f.opacity
+	opts.ColorScale.Scale(float32(opacity), float32(opacity), float32(opacity), float32(opacity))
+
 	screen.DrawImage(img, opts)
 }
 
+func (f *Food) spoil() {
+	if f.tickCounter%5 == 0 {
+		f.ticksToLive -= 2
+	}
+
+	f.opacity = math.Max(0, float64(f.ticksToLive)) / 100.0
+}
+
 func (f *Food) Update() error {
+	f.tickCounter += 1
+	f.spoil()
 	return nil
+}
+
+func (f *Food) Destroyed() bool {
+	return f.ticksToLive < 0
 }
 
 type Player struct {
@@ -199,3 +231,5 @@ func (p *Player) Update() error {
 
 	return nil
 }
+
+func (p *Player) Destroyed() bool { return false }
